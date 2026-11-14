@@ -15,7 +15,10 @@ Write-Host ('目标目录：' + $TargetDir)
 Remove-ItemProperty -Path $RunKey -Name 'KeyboardBrightness'
 Write-Host '开机自启已删除'
 
-Get-Process AutoHotkey64 | Stop-Process -Force
+# 只结束跑着本脚本的那个进程，机器上其它 AutoHotkey 脚本不碰
+Get-CimInstance Win32_Process -Filter "Name = 'AutoHotkey64.exe'" -ErrorAction SilentlyContinue |
+    Where-Object { $_.CommandLine -like '*brightness.ahk*' } |
+    ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }
 Start-Sleep -Milliseconds 600
 Write-Host '进程已结束'
 

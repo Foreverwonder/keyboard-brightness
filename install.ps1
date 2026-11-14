@@ -49,7 +49,11 @@ Set-ItemProperty -Path $RunKey -Name 'KeyboardBrightness' -Value $cmdLine -Type 
 Write-Host '开机自启已写入'
 
 # ---------- 4. 立刻启动 ----------
-Get-Process AutoHotkey64 -ErrorAction SilentlyContinue | Stop-Process -Force
+# 只结束跑着本脚本的那个进程。别写成 Get-Process AutoHotkey64，那会把机器上
+# 所有 AutoHotkey 脚本一起带走——别人的东西不该被我们碰。
+Get-CimInstance Win32_Process -Filter "Name = 'AutoHotkey64.exe'" -ErrorAction SilentlyContinue |
+    Where-Object { $_.CommandLine -like '*brightness.ahk*' } |
+    ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }
 Start-Sleep -Milliseconds 600
 Start-Process -FilePath $ExePath -ArgumentList ('"' + $ScriptPath + '"') -WorkingDirectory $TargetDir
 
