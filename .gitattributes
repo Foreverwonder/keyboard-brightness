@@ -1,0 +1,9 @@
+# Windows 上的文本文件统一用 CRLF。GitHub 打包 ZIP 时会按这里的规则写出，
+# 从 ZIP 里解压出来的 .bat 才不会被 cmd 当成一行读完。
+*.bat text eol=crlf
+*.ps1 text eol=crlf
+*.ahk text eol=crlf
+*.ini text eol=crlf
+*.txt text eol=crlf
+*.md  text eol=lf
+*.svg text eol=lf
